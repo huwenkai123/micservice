@@ -1,15 +1,20 @@
 package com.imooc.user.controller;
 
 import com.imooc.thrift.user.UserInfo;
+import com.imooc.user.dto.UserDto;
+import com.imooc.user.redis.RedisClient;
+import com.imooc.user.response.LoginResponse;
 import com.imooc.user.response.Response;
 import com.imooc.user.thrift.ServiceProvider;
 import org.apache.thrift.TException;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.MessageDigest;
 import java.util.Random;
@@ -18,8 +23,11 @@ import java.util.Random;
 public class UserController {
     @Autowired
     private ServiceProvider serviceProvider;
+    @Autowired
+    private RedisClient redisClient;
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @ResponseBody
     public Response login(@RequestParam("username")String username, @RequestParam("password") String password) {
         //1. 验证用户名密码　2.生成token 3.缓存用户
         UserInfo userInfo = null;
@@ -36,8 +44,15 @@ public class UserController {
             return Response.USERNAME_PASSWORD_INALID;
         }
         String token = genToken();
-        return null;
+        redisClient.set(token, toDto(userInfo), 3600);
+        return new LoginResponse(token);
 
+    }
+
+    private UserDto toDto(UserInfo userInfo) {
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(userDto, userInfo);
+        return userDto;
     }
 
 
