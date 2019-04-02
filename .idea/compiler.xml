@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="message-thrift-service-api" />
         <module name="user-edge-service" />
+        <module name="user-edge-service-client" />
         <module name="user-thrift-service" />
         <module name="user-thrift-service-api" />
       </profile>

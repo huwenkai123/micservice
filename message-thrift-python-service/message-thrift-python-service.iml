@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="4">
   <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/../out/production/message-thrift-python-service" />
+    <output-test url="file://$MODULE_DIR$/../out/test/message-thrift-python-service" />
+    <orderEntry type="jdk" jdkName="Python 3.6" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

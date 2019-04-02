@@ -4,7 +4,14 @@ import java.io.Serializable;
 
 public class Response implements Serializable {
     public static final Response USERNAME_PASSWORD_INALID = new Response("1001", "username or password is error");
+    public static final Response MOBILE_OR_EMAIL_REQUIREO = new Response("1002", "username or password is requireo");
+    public static final Response MOBILE_VERICODE = new Response("1003", "send, faild");
+    public static final Response VERIFY_CODE_INVALID = new Response("1004", "verify code invalid");
+    public static final Response SUCCESS = new Response();
 
+    public static Response expection(Exception e) {
+        return new Response("9999", e.getMessage());
+    }
 
     public String getCode() {
         return code;

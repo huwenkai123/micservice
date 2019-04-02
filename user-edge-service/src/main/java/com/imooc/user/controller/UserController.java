@@ -1,25 +1,24 @@
 package com.imooc.user.controller;
 
 import com.imooc.thrift.user.UserInfo;
-import com.imooc.user.dto.UserDto;
+import com.imooc.thrift.user.dto.UserDto;
 import com.imooc.user.redis.RedisClient;
 import com.imooc.user.response.LoginResponse;
 import com.imooc.user.response.Response;
 import com.imooc.user.thrift.ServiceProvider;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TException;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.MessageDigest;
 import java.util.Random;
 
 @Controller
+@RequestMapping("/user")
 public class UserController {
     @Autowired
     private ServiceProvider serviceProvider;
@@ -49,9 +48,74 @@ public class UserController {
 
     }
 
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @ResponseBody
+    public Response register(@RequestParam("username") String username,
+                             @RequestParam("password") String password,
+                             @RequestParam(value = "mobile", required = false) String mobile,
+                             @RequestParam(value = "email", required = false) String email,
+                             @RequestParam(value = "verifyCode") String verifyCode) {
+        if (StringUtils.isEmpty(mobile) && StringUtils.isEmpty(password)) {
+            return Response.MOBILE_OR_EMAIL_REQUIREO;
+        }
+        if (StringUtils.isNotBlank(mobile)) {
+            String redisCode = redisClient.get(mobile);
+            if (!verifyCode.equals(redisCode)) {
+                return Response.VERIFY_CODE_INVALID;
+            }
+        } else if (StringUtils.isNotBlank(email)) {
+            String redisCode = redisClient.get(email);
+            if (!verifyCode.equals(redisCode)) {
+                return Response.VERIFY_CODE_INVALID;
+            }
+        }
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUsername(username);
+        userInfo.setPassword(md5(password));
+        userInfo.setMobile(mobile);
+        userInfo.setEmail(email);
+        try {
+            serviceProvider.getUserService().regiserUser(userInfo);
+        } catch (TException e) {
+            e.printStackTrace();
+            return Response.expection(e);
+        }
+        return Response.SUCCESS;
+
+    }
+
+
+
+
+
+    @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.POST)
+    @ResponseBody
+    public Response sendVerifyCode(@RequestParam(value = "email", required = false) String email, @RequestParam(value = "mobile", required = false) String mobile) {
+        String message = "Very code is";
+        String code = randomCode("0123456789", 6);
+        try {
+
+            boolean result = false;
+            if (StringUtils.isNotBlank(mobile)) {
+                result = serviceProvider.getMessageService().sendMobileMessage(mobile, message + code);
+                redisClient.set(mobile, code);
+            } else if (StringUtils.isNotBlank(email)) {
+                result = serviceProvider.getMessageService().sendEmailMessage(email,message + code);
+                redisClient.set(mobile, code);
+            }
+            if (!result) {
+                return Response.MOBILE_VERICODE;
+            }
+        } catch (TException e) {
+            e.printStackTrace();
+            return Response.expection(e);
+        }
+        return Response.SUCCESS;
+    }
+
     private UserDto toDto(UserInfo userInfo) {
         UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(userDto, userInfo);
+        BeanUtils.copyProperties(userInfo,  userDto);
         return userDto;
     }
 
@@ -71,6 +135,13 @@ public class UserController {
     }
 
 
+    @RequestMapping(value = "/authentication", method = RequestMethod.POST)
+    @ResponseBody
+    public UserDto authentication(@RequestHeader("token") String token) {
+        return redisClient.get(token);
+    }
+
+
     private String md5(String password) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
@@ -79,5 +150,10 @@ public class UserController {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String login() {
+        return "/login";
     }
 }

@@ -1,4 +1,4 @@
-package com.imooc.user.dto;
+package com.imooc.thrift.user.dto;
 
 import java.io.Serializable;
 
