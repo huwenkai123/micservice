@@ -6,6 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="api-gateway-zuul" />
+        <module name="course-dubbo-service" />
+        <module name="course-dubbo-service-api" />
+        <module name="course-edge-service" />
         <module name="message-thrift-service-api" />
         <module name="user-edge-service" />
         <module name="user-edge-service-client" />

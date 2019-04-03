@@ -45,13 +45,16 @@ public abstract class LoginFilter implements Filter {
             userDto = cache.getIfPresent(token);
             if (userDto == null) {
                 userDto = requestInfo(token);
+                if (userDto != null) {
+                    cache.put(token, userDto);
+                }
             }
         }
         if (userDto == null) {
             response.sendRedirect("http://127.0.0.1:8082/user/login");
             return;
         }
-        cache.put(token, userDto);
+
         login(request, response, userDto);
         filterChain.doFilter(request, response);
     }

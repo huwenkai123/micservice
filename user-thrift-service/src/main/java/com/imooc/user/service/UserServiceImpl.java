@@ -10,16 +10,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService.Iface {
-    @Override
-    public UserInfo getUserById(int id) throws TException {
-        return null;
-    }
+
 
     @Autowired
     private UserMapper userMapper;
+
+    @Override
+    public UserInfo getUserById(int id) throws TException {
+        return userMapper.getUserById(id);
+    }
     @Override
     public UserInfo getTeacherById(int id) throws TException {
-        return userMapper.getUserById(id);
+        return userMapper.getTeacherById(id);
     }
 
     @Override
