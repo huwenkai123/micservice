@@ -19,7 +19,7 @@ public class ThriftServer {
     @Autowired
     private UserService.Iface userService;
 
-    @Value("${service.port}")
+    @Value("${server.port}")
     private int servicePort;
 
 

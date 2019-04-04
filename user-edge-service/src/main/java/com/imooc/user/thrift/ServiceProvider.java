@@ -26,9 +26,14 @@ public class ServiceProvider {
     @Value("${thrift.message.port}")
     private int messageServerPort;
 
+    @Value("${thrift.message.java.ip}")
+    private String messageJavaServerIp;
+    @Value("${thrift.message.java.port}")
+    private int messageJavaServerPort;
+
 
     private enum ServiceType{
-        USER,MESSAGE
+        USER,MESSAGE,JAVAMESSAGE
     }
 
     public UserService.Client getUserService() {
@@ -37,6 +42,10 @@ public class ServiceProvider {
 
     public MessageService.Client getMessageService() {
         return getService(messageServerIp, messageServerPort, ServiceType.MESSAGE);
+    }
+
+    public MessageService.Client getJavaMessage() {
+        return getService(messageJavaServerIp, messageJavaServerPort, ServiceType.JAVAMESSAGE);
     }
 
     public <T> T getService(String ip, Integer port, ServiceType serviceType) {
@@ -55,6 +64,9 @@ public class ServiceProvider {
                 result = new UserService.Client(protocol);
                 break;
             case MESSAGE:
+                result = new MessageService.Client(protocol);
+                break;
+            case JAVAMESSAGE:
                 result = new MessageService.Client(protocol);
                 break;
         }

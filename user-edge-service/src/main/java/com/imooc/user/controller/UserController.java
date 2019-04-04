@@ -97,10 +97,10 @@ public class UserController {
 
             boolean result = false;
             if (StringUtils.isNotBlank(mobile)) {
-                result = serviceProvider.getMessageService().sendMobileMessage(mobile, message + code);
+                result = serviceProvider.getJavaMessage().sendMobileMessage(mobile, message + code);
                 redisClient.set(mobile, code);
             } else if (StringUtils.isNotBlank(email)) {
-                result = serviceProvider.getMessageService().sendEmailMessage(email,message + code);
+                result = serviceProvider.getJavaMessage().sendEmailMessage(email,message + code);
                 redisClient.set(mobile, code);
             }
             if (!result) {

@@ -10,6 +10,7 @@
         <module name="course-dubbo-service" />
         <module name="course-dubbo-service-api" />
         <module name="course-edge-service" />
+        <module name="message-thrift-service" />
         <module name="message-thrift-service-api" />
         <module name="user-edge-service" />
         <module name="user-edge-service-client" />
