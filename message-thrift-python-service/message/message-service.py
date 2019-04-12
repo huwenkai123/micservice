@@ -8,7 +8,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 
-sender = 'imoocd@163.com'
+sender = 'school@163.com'
 authCode = 'aA111111'
 class MessageServiceHandler:
 
